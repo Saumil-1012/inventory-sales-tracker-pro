@@ -4,6 +4,7 @@ A terminal-based Inventory and Sales Tracker for small businesses written in C++
 
 ## 🔧 Features
 
+
 - Add, Edit, Delete products from inventory
 - Real-time stock update after each sale
 - Track and store sales with timestamp

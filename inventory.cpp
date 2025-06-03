@@ -8,6 +8,7 @@ Inventory::Inventory(const std::string& filename) : filename(filename) {
     load();
 }
 
+
 void Inventory::load() {
     products.clear();
     std::ifstream in(filename);

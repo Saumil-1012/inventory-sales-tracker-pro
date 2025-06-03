@@ -1,6 +1,8 @@
 #include <iostream>
 #include "inventory.h"
 #include "sales.h"
+#include "utils.h"
+
 
 int main() {
     Inventory inventory("data/inventory.txt");

@@ -9,6 +9,7 @@ struct Product {
     double price;
 };
 
+
 class Inventory {
 private:
     std::string filename;

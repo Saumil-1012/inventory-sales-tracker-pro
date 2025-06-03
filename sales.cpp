@@ -5,6 +5,7 @@
 #include <map>
 #include <ctime>
 
+
 Sales::Sales(const std::string& filename) : filename(filename) {}
 
 void Sales::sellProduct(Inventory& inventory) {

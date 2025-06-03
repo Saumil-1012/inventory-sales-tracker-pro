@@ -1,5 +1,5 @@
 #pragma once
 
 namespace Utils {
-    void backupFiles();
+    void backupFiles();  // This line must be inside namespace
 }

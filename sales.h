@@ -6,6 +6,7 @@ class Sales {
 private:
     std::string filename;
 
+    
 public:
     Sales(const std::string& filename);
     void sellProduct(Inventory& inventory);

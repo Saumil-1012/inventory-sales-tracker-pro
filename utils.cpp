@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ctime>
 
+
 void Utils::backupFiles() {
     std::ifstream inventory("data/inventory.txt");
     std::ifstream sales("data/sales.txt");
