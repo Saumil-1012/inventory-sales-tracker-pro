@@ -9,7 +9,6 @@ struct Product {
     double price;
 };
 
-
 class Inventory {
 private:
     std::string filename;
@@ -26,4 +25,9 @@ public:
     void restockProduct();
     bool updateStock(int id, int quantityChange);
     Product* getProduct(int id);
+    void searchProduct(const std::string& keyword) const;
+    void lowStockAlert(int threshold) const;
+    void sortInventoryByPrice() const;
+    void inventoryValueReport() const;
+    void importFromCSV(const std::string& csvFile);
 };

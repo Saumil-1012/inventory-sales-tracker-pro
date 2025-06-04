@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Run Inventory Tracker",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/tracker",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        }
+    ]
+}
