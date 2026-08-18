@@ -10,7 +10,7 @@ Role Auth::login() {
     std::cout << "Password: ";
     std::cin >> password;
 
-    std::ifstream file("data/login.txt");
+    std::ifstream file("Data/login.txt");
     std::string line;
     while (getline(file, line)) {
         std::stringstream ss(line);

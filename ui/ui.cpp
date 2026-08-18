@@ -1,11 +1,16 @@
 #include "ui.h"
+#include <cstdlib>
 #include <iostream>
 #include <limits>
 
 void UI::showBanner(const std::string& role) {
-    std::cout << "\033[1;36m==============================\033[0m\n";
-    std::cout << "  Inventory & Sales Tracker - " << role << "\n";
-    std::cout << "\033[1;36m==============================\033[0m\n";
+    std::cout << "\033[1;36m========================================================\033[0m\n";
+    std::cout << "     Futuristic Inventory & Sales Command Center  //  " << role << "\n";
+    std::cout << "\033[1;36m========================================================\033[0m\n";
+}
+
+void UI::showPulseHeader(const std::string& title) {
+    std::cout << "\n\033[1;32m[2030 OPS SIGNAL]\033[0m " << title << "\n";
 }
 
 void UI::showMenu(bool isAdmin) {
@@ -18,11 +23,13 @@ void UI::showMenu(bool isAdmin) {
     std::cout << "9. Top Selling Product\n10. Backup Data\n11. Search Product\n";
     std::cout << "12. Low Stock Alert\n13. Sort Inventory by Price\n14. Inventory Value Report\n";
     std::cout << "15. Search Sales\n16. Filter Sales by Date\n17. Cancel Sale Entry\n";
-    std::cout << "18. Export Sales CSV\n19. Exit\n";
+    std::cout << "18. Export Sales CSV\n19. Exit\n21. 2030 Smart Pulse\n";
 }
 
 void UI::clearScreen() {
-    std::system("clear");
+    if (std::getenv("TERM") != nullptr) {
+        std::system("clear");
+    }
 }
 
 void UI::pause() {

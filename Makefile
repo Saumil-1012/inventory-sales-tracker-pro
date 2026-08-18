@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -I/Library/Developer/CommandLineTools/usr/include
+CXXFLAGS = -std=c++11 -Wall -I. -I/Library/Developer/CommandLineTools/usr/include
 LDFLAGS = -lsqlite3
 TARGET = tracker
 
