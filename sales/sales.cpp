@@ -54,6 +54,48 @@ void Sales::salesReport() const {
     std::cout << "\nTotal Transactions: " << transactions << "\nTotal Revenue: $" << totalRevenue << "\n";
 }
 
+void Sales::smartSalesPulse() const {
+    std::ifstream in(filename);
+    std::string line;
+    double totalRevenue = 0;
+    int totalUnits = 0;
+    int transactions = 0;
+    std::map<std::string, int> productSales;
+
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+        std::stringstream ss(line);
+        std::string id, name, qty, total, timestamp;
+        getline(ss, id, ',');
+        getline(ss, name, ',');
+        getline(ss, qty, ',');
+        getline(ss, total, ',');
+        getline(ss, timestamp);
+
+        totalRevenue += std::stod(total);
+        totalUnits += std::stoi(qty);
+        transactions++;
+        productSales[name] += std::stoi(qty);
+    }
+
+    std::string bestProduct;
+    int bestVolume = 0;
+    for (const auto& entry : productSales) {
+        if (entry.second > bestVolume) {
+            bestVolume = entry.second;
+            bestProduct = entry.first;
+        }
+    }
+
+    double avgOrderValue = transactions == 0 ? 0.0 : totalRevenue / transactions;
+    std::cout << "\n=== 2030 SMART SALES PULSE ===\n";
+    std::cout << "Revenue tracked: $" << totalRevenue << "\n";
+    std::cout << "Units sold: " << totalUnits << "\n";
+    std::cout << "Transactions: " << transactions << "\n";
+    std::cout << "Average basket value: $" << avgOrderValue << "\n";
+    std::cout << "Top mover: " << bestProduct << " (" << bestVolume << " units)\n";
+}
+
 void Sales::topSellingProduct() const {
     std::ifstream in(filename);
     std::string line;

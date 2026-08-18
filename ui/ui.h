@@ -7,4 +7,5 @@ namespace UI {
     void clearScreen();
     void pause();
     int getChoice();
+    void showPulseHeader(const std::string& title);
 }

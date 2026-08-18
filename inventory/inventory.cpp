@@ -174,6 +174,35 @@ void Inventory::inventoryValueReport() const {
     std::cout << "\nTotal Inventory Value: $" << total << "\n";
 }
 
+void Inventory::inventoryPulse() const {
+    double totalValue = 0;
+    int lowStockCount = 0;
+    int totalUnits = 0;
+    int healthiestStock = 0;
+    std::string topPerformer;
+
+    for (const auto& p : products) {
+        totalValue += p.price * p.quantity;
+        totalUnits += p.quantity;
+        if (p.quantity <= 10) {
+            lowStockCount++;
+        }
+        if (p.quantity > healthiestStock) {
+            healthiestStock = p.quantity;
+            topPerformer = p.name;
+        }
+    }
+
+    int healthScore = products.empty() ? 0 : static_cast<int>((1.0 - (static_cast<double>(lowStockCount) / std::max(1, static_cast<int>(products.size()))) ) * 100);
+
+    std::cout << "\n=== 2030 SMART INVENTORY PULSE ===\n";
+    std::cout << "Inventory value: $" << totalValue << "\n";
+    std::cout << "Units on hand: " << totalUnits << "\n";
+    std::cout << "Low-stock alerts: " << lowStockCount << "\n";
+    std::cout << "Inventory health score: " << healthScore << "%\n";
+    std::cout << "Strongest stock position: " << topPerformer << " (" << healthiestStock << " units)\n";
+}
+
 void Inventory::importFromCSV(const std::string& csvFile) {
     std::ifstream in(csvFile);
     if (!in.is_open()) {

@@ -29,5 +29,6 @@ public:
     void lowStockAlert(int threshold) const;
     void sortInventoryByPrice() const;
     void inventoryValueReport() const;
+    void inventoryPulse() const;
     void importFromCSV(const std::string& csvFile);
 };

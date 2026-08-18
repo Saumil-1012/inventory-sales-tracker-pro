@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "inventory.h"
+#include "inventory/inventory.h"
 
 class Sales {
 private:
@@ -12,6 +12,7 @@ public:
     void viewSales() const;
     void salesReport() const;
     void topSellingProduct() const;
+    void smartSalesPulse() const;
     void monthlySummary(const std::string& month) const;
     void exportCSV(const std::string& outputFile) const;
     void searchSalesByProduct(const std::string& keyword) const;

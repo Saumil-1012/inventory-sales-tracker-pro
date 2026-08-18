@@ -6,8 +6,8 @@
 #include "ui/ui.h"
 
 int main() {
-    Inventory inventory("data/inventory.txt");
-    Sales sales("data/sales.txt");
+    Inventory inventory("Data/inventory.txt");
+    Sales sales("Data/sales.txt");
 
     Role role = Auth::login();
     if (role == Role::INVALID) return 1;
@@ -86,11 +86,16 @@ int main() {
                 }
                 break;
             }
+            case 21: {
+                inventory.inventoryPulse();
+                sales.smartSalesPulse();
+                break;
+            }
             default: std::cout << "Invalid choice.\n";
         }
-
+ 
         if (choice != 19) UI::pause();
-
+ 
     } while (choice != 19);
 
     return 0;

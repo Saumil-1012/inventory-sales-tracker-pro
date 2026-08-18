@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "inventory.h"
+#include "inventory/inventory.h"
 
 namespace DB {
     bool init(const std::string& dbFile);
