@@ -1,30 +1,58 @@
 #include "login.h"
 #include <iostream>
-#include <fstream>
-#include <sstream>
+#include <string>
+
+// Default credentials: admin/admin123, staff/staff123
+// TODO: Replace with database or config file before production
+// SECURITY WARNING: Passwords are plaintext here for demo. Use bcrypt/Argon2 in production.
+
+const std::map<std::string, User> Auth::USERS = {
+    {
+        "admin",
+        {"admin", "admin123", Role::ADMIN}  // TODO: Replace with hash
+    },
+    {
+        "staff",
+        {"staff", "staff123", Role::STAFF}  // TODO: Replace with hash
+    }
+};
+
+bool Auth::validateCredentials(const std::string& username, const std::string& password) {
+    auto it = USERS.find(username);
+    
+    if (it == USERS.end()) {
+        return false;
+    }
+    
+    // In production, use proper password hashing (bcrypt, Argon2, etc.)
+    // This simple comparison is only for development
+    return it->second.passwordHash == password;
+}
 
 Role Auth::login() {
     std::string username, password;
-    std::cout << "Username: ";
-    std::cin >> username;
-    std::cout << "Password: ";
-    std::cin >> password;
-
-    std::ifstream file("data/login.txt");
-    std::string line;
-    while (getline(file, line)) {
-        std::stringstream ss(line);
-        std::string storedUser, storedPass, role;
-        getline(ss, storedUser, ',');
-        getline(ss, storedPass, ',');
-        getline(ss, role);
-
-        if (username == storedUser && password == storedPass) {
-            if (role == "admin") return Role::ADMIN;
-            if (role == "staff") return Role::STAFF;
+    int attempts = 3;
+    
+    while (attempts > 0) {
+        std::cout << "\n=== Inventory & Sales Tracker ===\n";
+        std::cout << "Username: ";
+        std::cin >> username;
+        std::cout << "Password: ";
+        std::cin >> password;
+        
+        if (validateCredentials(username, password)) {
+            auto user = USERS.at(username);
+            std::cout << "\n✓ Login successful. Welcome, " << username << "!\n";
+            return user.role;
+        }
+        
+        attempts--;
+        if (attempts > 0) {
+            std::cerr << "\n✗ Invalid credentials. " << attempts << " attempt(s) remaining.\n";
+        } else {
+            std::cerr << "\n✗ Maximum login attempts exceeded. Exiting.\n";
         }
     }
-
-    std::cout << "Login failed.\n";
+    
     return Role::INVALID;
 }

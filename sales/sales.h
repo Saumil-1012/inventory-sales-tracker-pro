@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "inventory.h"
+#include <map>
+#include "../inventory/inventory.h"
 
 class Sales {
 private:

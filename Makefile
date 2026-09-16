@@ -1,20 +1,23 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -Wall -I/Library/Developer/CommandLineTools/usr/include
-LDFLAGS = -lsqlite3
-TARGET = tracker
-
-SRC = main.cpp \
-      inventory/inventory.cpp \
-      sales/sales.cpp \
-      auth/login.cpp \
-      utils.cpp \
-      database/database.cpp \
-      ui/ui.cpp
+CXXFLAGS = -std=c++17 -Wall -Wextra
+TARGET = inventory_tracker
+SOURCES = main.cpp utils.cpp inventory/inventory.cpp sales/sales.cpp auth/login.cpp ui/ui.cpp
+OBJECTS = $(SOURCES:.cpp=.o)
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJECTS)
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(OBJECTS) $(TARGET)
+
+rebuild: clean all
+
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean rebuild run

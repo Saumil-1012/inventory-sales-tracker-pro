@@ -1,0 +1,5 @@
+node_modules/
+*.o
+inventory_tracker
+.env
+.DS_Store

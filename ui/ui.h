@@ -7,4 +7,6 @@ namespace UI {
     void clearScreen();
     void pause();
     int getChoice();
+    void displayError(const std::string& message);
+    void displaySuccess(const std::string& message);
 }

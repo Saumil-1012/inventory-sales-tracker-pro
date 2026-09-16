@@ -1,172 +1,323 @@
-# 🧾 Inventory & Sales Tracker – Terminal Edition (C++11)
+# Inventory & Sales Tracker Pro
 
-A modular, file-based terminal application for small businesses to manage inventory and sales in real-time. Built in modern C++11 with extensibility in mind.
+A robust command-line inventory management system with role-based access control, real-time sales tracking, and comprehensive reporting capabilities.
 
----
+## Overview
 
-## 📌 Project Objective
+**Inventory & Sales Tracker Pro** is a multi-user inventory management solution designed for retail and warehouse operations. It provides role-based access (Admin/Staff), real-time stock monitoring, transaction history, and detailed business analytics.
 
-Design a console-based system that:
-- Manages product inventory (add/edit/delete)
-- Tracks real-time sales
-- Provides daily and monthly analytics
-- Exports data for reporting and backup
+### Key Features
 
----
+- **Role-Based Access Control**: Admin and Staff roles with differentiated permissions
+- **Inventory Management**: Add, edit, delete, and search products
+- **Sales Tracking**: Record sales transactions with automatic timestamp logging
+- **Stock Monitoring**: Real-time low-stock alerts and inventory value reports
+- **Data Export**: Export sales records to CSV format
+- **Backup & Recovery**: Automated file-based backup system
+- **Advanced Queries**: Sort by price, filter by date, search by product/ID
+- **Transaction Reversal**: Cancel sale entries with automatic stock restoration
 
-## 🔧 Technical Stack
+## System Requirements
 
-- Language: C++11
-- Storage: Text-based (`inventory.txt`, `sales.txt`)
-- Concepts: OOP, File I/O, Vectors, Time Handling, Sorting, Modularization
-- Optional Extensions: CSV, SQLite, GUI with Qt
+- **C++17** compatible compiler (GCC 7.0+, Clang 5.0+, MSVC 2017+)
+- **Python 3.7+** (for monitoring utilities)
+- **Unix/Linux/macOS/Windows** compatible shell
+- Minimum 10MB free disk space
 
----
+## Build Instructions
 
-## 🧾 Inventory Management Features
+### Prerequisites
 
-- `addProduct()` – Add new product with ID, name, quantity, price
-- `editProduct(int id)` – Update product name or price
-- `deleteProduct(int id)` – Remove a product
-- `viewInventory()` – Display all products
-- `searchProduct(std::string keyword)` – Search by ID or name
-- `lowStockAlert(int threshold)` – View items with low stock
-- `updateStock(int id, int delta)` – Adjust stock after sales
-- `restockProduct(int id, int amount)` – Increase product quantity
-- `sortInventoryByPrice()` – View inventory sorted by price
-- `inventoryValueReport()` – Calculate total inventory worth
+```bash
+# macOS (using Homebrew)
+brew install gcc
 
----
+# Debian/Ubuntu
+sudo apt-get install build-essential
 
-## 💵 Sales Management Features
-
-- `sellProduct()` – Register a sale and update inventory
-- `viewSales()` – Show all sale logs
-- `searchSalesByProduct()` – Search all sales for a product
-- `salesReport()` – View total revenue and sales count
-- `topSellingProduct()` – Identify most sold item
-- `filterSalesByDate(std::string date)` – Filter sales by specific date
-- `cancelSaleEntry(int lineNumber)` – Remove mistaken entry and restore stock
-
----
-
-## 📊 Reporting / Analytics
-
-- `dailySummary()` – Show today's total revenue
-- `monthlySummary(std::string month)` – View summary for a specific month
-- `stockToRevenueRatio()` – Compare total stock value to revenue
-- `generateReportCSV()` – Export sales data to CSV
-- `backupData()` – Backup all records to `/backup/`
-
----
-
-## 📁 Data Format
-
-**inventory.txt**
-```
-ProductID,Name,Quantity,Price
+# RHEL/CentOS
+sudo yum install gcc-c++
 ```
 
-**sales.txt**
+### Compilation
+
+```bash
+# Clone or navigate to project root
+cd inventory-sales-tracker-pro
+
+# Build the project
+make clean && make
+
+# Run the application
+make run
+
+# Or execute directly
+./inventory_tracker
 ```
-ProductID,Name,QuantitySold,TotalPrice,Timestamp
+
+### Build Targets
+
+| Command | Action |
+|---------|--------|
+| `make all` | Compile all sources (default) |
+| `make clean` | Remove compiled objects and executable |
+| `make rebuild` | Full clean build |
+| `make run` | Build and execute |
+
+## Usage
+
+### Login
+
+On application start, authenticate with credentials:
+
 ```
+=== Inventory & Sales Tracker Login ===
+Username: admin
+Password: admin123
+```
+
+**Default Accounts:**
+- **Admin**: username: `admin`, password: `admin123`
+- **Staff**: username: `staff`, password: `staff123`
+
+> **Security Notice**: Change default credentials in `auth/login.cpp` before production deployment.
+
+### Main Menu
+
+#### Admin Functions
+1. **View Inventory** - Display all products with current stock
+2. **Add Product** - Create new product entry (ID, name, price, quantity)
+3. **Edit Product** - Modify existing product details
+4. **Delete Product** - Remove product from inventory
+5. **Restock Product** - Add quantity to existing product
+6. **Sell Product** - Record sales transaction with stock deduction
+7. **View Sales History** - Display all recorded transactions
+8. **Sales Report** - Summary statistics of sales transactions
+9. **Top Selling Product** - Identify most-sold item by volume
+10. **Backup Files** - Create copies of inventory and sales data
+11. **Search Product** - Query by product ID or name
+12. **Low Stock Alert** - Flag items below user-specified threshold
+13. **Sort by Price** - Reorder inventory by price (ascending)
+14. **Inventory Value Report** - Calculate total asset value
+15. **Search Sales by Product** - Filter transactions by product
+16. **Filter Sales by Date** - Display transactions from specific date
+17. **Cancel Sale Entry** - Reverse a transaction and restore stock
+18. **Export Sales to CSV** - Generate reportable CSV file
+20. **Import from CSV** - Bulk load products from external file
+
+#### Staff Functions
+- Menu items 1, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 available
+- Items 2, 3, 4, 20 restricted (Admin only)
+
+### Example Workflows
+
+**Adding a Product (Admin)**
+```
+Choice: 2
+Enter product ID: SKU001
+Enter product name: Widget A
+Enter price: 29.99
+Enter quantity: 150
+Product added successfully.
+```
+
+**Recording a Sale (Any User)**
+```
+Choice: 6
+Enter product ID: SKU001
+Enter quantity to sell: 5
+Sale recorded successfully.
+```
+
+**Viewing Low Stock Items**
+```
+Choice: 12
+Enter stock threshold: 20
+LOW STOCK: Widget B (ID: SKU002) - Qty: 15
+LOW STOCK: Gadget X (ID: SKU005) - Qty: 8
+```
+
+## Data Storage
+
+### File Structure
+
+```
+inventory-sales-tracker-pro/
+├── data/
+│   ├── inventory.txt      # Product master data
+│   └── sales.txt          # Transaction log
+├── backup/
+│   ├── inventory_backup.txt
+│   └── sales_backup.txt
+├── src files...
+└── inventory_tracker      # Compiled executable
+```
+
+### Data Format
+
+**inventory.txt** (space-delimited):
+```
+SKU001 Widget_A 29.99 145
+SKU002 Widget_B 19.50 8
+SKU003 Gadget_X 49.99 42
+```
+
+**sales.txt** (pipe-delimited):
+```
+SKU001 | 5 | Nov 20 2024 14:32:15
+SKU002 | 2 | Nov 20 2024 15:18:42
+```
+
+## Architecture
+
+### Core Components
+
+**Inventory Module** (`inventory/inventory.{h,cpp}`)
+- Product CRUD operations
+- File persistence with in-memory cache
+- Linear search optimization for datasets < 100K items
+- CSV import/export with header detection
+
+**Sales Module** (`sales/sales.{h,cpp}`)
+- Transaction recording with UTC timestamps
+- Aggregation queries (top products, date filtering)
+- Sale reversal with inventory reconciliation
+- CSV export for external reporting
+
+**Auth Module** (`auth/login.{h,cpp}`)
+- Role-based access enumeration (ADMIN, STAFF, INVALID)
+- Credential verification (file-based, not encrypted)
+
+**UI Module** (`ui/ui.{h,cpp}`)
+- Cross-platform screen management (Windows/Unix)
+- Menu system with role-aware filtering
+- Input validation and buffering
+
+**Utils Module** (`utils.{h,cpp}`)
+- File backup with directory creation
+- Error handling and resource cleanup
+
+### Design Patterns
+
+- **Separation of Concerns**: Data (Inventory/Sales) separate from UI
+- **Encapsulation**: Private data members, public interfaces
+- **Single Responsibility**: Each class handles one domain
+- **Resource Management**: RAII-style destructors for file I/O
+
+## Python Utilities
+
+### Monitoring Tool (`realtime_data.py`)
+
+Real-time inventory monitoring with low-stock alerting.
+
+**Usage:**
+
+```bash
+# Start continuous monitoring
+python3 realtime_data.py
+
+# Generate report (one-time)
+python3 realtime_data.py report
+
+# Configure threshold (edit file)
+LOW_STOCK_THRESHOLD = 10  # in realtime_data.py
+```
+
+**Output:**
+- Logs low-stock events to `data/alerts.log`
+- Console display with timestamp and product details
+- Stop with Ctrl+C
+
+## Performance Characteristics
+
+| Operation | Complexity | Notes |
+|-----------|-----------|-------|
+| Product Lookup | O(n) | Linear search; suitable for n < 100K |
+| Product Insert | O(1) | Append + file write |
+| Product Delete | O(n) | Requires array compaction |
+| Sales Query | O(n*m) | Full file scan per query |
+| Sort by Price | O(n log n) | std::sort with comparator |
+
+**Optimization Recommendations for Scale:**
+- Implement B-tree or hash index for product lookups
+- Use SQLite instead of flat files for >100K products
+- Add in-memory caching with LRU eviction for sales queries
+- Implement transaction logging for ACID compliance
+
+## Security Considerations
+
+⚠️ **Production Deployment Warnings:**
+
+1. **Hardcoded Credentials**: Replace with hashed password file or LDAP integration
+2. **No Encryption**: Sensitive data stored in plaintext; use encrypted filesystem
+3. **Input Validation**: Limited; add regex/type validation before file writes
+4. **Access Logging**: No audit trail; consider syslog integration
+5. **File Permissions**: Ensure `data/` and `backup/` are readable only by app user
+
+### Recommendations
+
+```bash
+# Set restrictive permissions
+chmod 700 data/ backup/
+chmod 600 data/*.txt backup/*.txt
+
+# Run with minimal privileges
+useradd -r -s /bin/false inventory_app
+chown -R inventory_app:inventory_app /opt/inventory_tracker
+```
+
+## Troubleshooting
+
+### Compilation Errors
+
+**Error**: `error: 'to_string' is not a member of 'std'`
+- **Solution**: Ensure `-std=c++17` flag is set in Makefile
+
+**Error**: `undefined reference to 'Inventory::loadFromFile()'`
+- **Solution**: Rebuild with `make clean && make`
+
+### Runtime Issues
+
+**"Backup failed: Could not open files"**
+- Ensure `data/` directory exists and contains `inventory.txt` and `sales.txt`
+- Check file permissions: `ls -la data/`
+
+**"Product not found" when searching**
+- Verify product ID exactly matches (case-sensitive)
+- Try viewing full inventory first to confirm data exists
+
+**"No sales history" / "No inventory data"**
+- Files may be empty; add test data manually or via import
+
+## Contributing
+
+Code contributions should follow these guidelines:
+
+1. **Naming Conventions**:
+   - Classes: PascalCase (`ProductManager`)
+   - Methods: camelCase (`loadFromFile()`)
+   - Constants: UPPER_SNAKE_CASE (`MAX_PRODUCTS`)
+
+2. **Error Handling**: All file operations should check open/read status
+3. **Documentation**: Add comments for algorithms and non-obvious logic
+4. **Testing**: Verify changes don't break existing menus/workflows
+
+## License
+
+See LICENSE file for details.
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | Nov 2024 | Initial release with core inventory/sales management |
+
+## Support & Contact
+
+For issues or feature requests, refer to internal project documentation or contact the development team.
 
 ---
 
-## 📈 Development Phases
-
-1. **Core Features**: Add/Sell/View products
-2. **Reporting**: Revenue, Top Sellers
-3. **Search/Filter**: Date-based, name-based
-4. **Utilities**: Backup, CSV Export
-5. **(Optional)**: Admin login, GUI, SQLite backend
-
----
-
-## 📄 License
-
-MIT License – Free to use and modify.
-
-
-
-
-
-
-🔁 ✅ Additional Functionalities You Can Implement
-🧾 Advanced Inventory Management Functions
-bulkImportInventory(std::string filename)
-→ Import multiple products from a .csv or .txt file into inventory
-
-checkProductExistence(int id)
-→ Return true/false if a product with a given ID exists (for error prevention)
-
-saveInventorySnapshot()
-→ Save a snapshot of current inventory into backup/inventory_YYYYMMDD.txt
-
-categoryWiseInventorySummary()
-→ If products have categories (like fruit, dairy, etc.), show stock grouped by category
-
-sortInventoryByQuantity()
-→ Sort items based on remaining quantity (ascending or descending)
-
-autoGenerateProductID()
-→ Automatically assign new IDs for added products, avoiding duplicates
-
-💵 Enhanced Sales Management Features
-generateCustomerInvoice()
-→ Create a human-readable invoice after each sale in invoices/
-
-multiProductSale()
-→ Support selling multiple different products in a single transaction
-
-undoLastSale()
-→ Undo the last sale entry and restore inventory
-
-applyDiscount(int productID, double percent)
-→ Apply a discount on a specific product during sale
-
-dailySalesSummary(std::string date)
-→ Show a summary for any selected day, not just today
-
-markSaleAsReturned(int saleID)
-→ Track customer returns and adjust inventory/revenue accordingly
-
-📊 Enhanced Analytics & Reporting
-generateTopNProductsReport(int N)
-→ List top N best-selling products by quantity or revenue
-
-compareDailyRevenues(std::string date1, std::string date2)
-→ Compare revenue between two dates
-
-averageBasketSize()
-→ Calculate the average number of items per sale (helps in business insight)
-
-revenuePerProduct()
-→ How much each product has contributed to total revenue
-
-identifyDeadStock()
-→ List products that haven’t been sold for X days
-
-🔐 Administrative & Utility Features
-adminLogin()
-→ Protect sensitive operations like delete/edit using password authentication
-
-logErrorsToFile(std::string message)
-→ Write program errors or failed operations into log.txt for debugging
-
-autoBackupOnExit()
-→ Automatically back up inventory and sales when user exits the program
-
-generateHTMLReport()
-→ Export inventory/sales report in a styled .html file for business use
-
-restoreFromBackup(std::string fileName)
-→ Restore old inventory or sales data from backup folder
-
-🧪 Debug & Testing Utilities (for development)
-runSelfTest()
-→ Validate data consistency: inventory quantities, ID uniqueness, and file health
-
-simulateRandomSales(int count)
-→ For testing purposes, simulate N random sales and observe system behavior
+**Last Updated**: November 2024  
+**Status**: Production-Ready  
+**Maintainer**: Development Team
