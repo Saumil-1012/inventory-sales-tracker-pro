@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 const { getPool } = require('../db/postgres');
 const config = require('../config');
 const { authMiddleware } = require('../middleware/auth');
+const { planLimits, requireActiveSubscription, enforceLimit } = require('../middleware/subscription');
 
 const router = express.Router();
 
@@ -113,6 +114,16 @@ router.get('/me', authMiddleware, requireOrganization, async (req, res) => {
     }
 });
 
+router.get('/limits', authMiddleware, requireOrganization, async (req, res) => {
+    try {
+        const result = await getPool().query(`SELECT plan, status FROM subscriptions WHERE organization_id = $1`, [req.user.organizationId]);
+        const subscription = result.rows[0] || { plan: 'TRIAL', status: 'TRIALING' };
+        res.json({ plan: subscription.plan, status: subscription.status, limits: planLimits[subscription.plan] || planLimits.TRIAL });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 router.get('/members', authMiddleware, requireOrganization, async (req, res) => {
     try {
         const result = await getPool().query(
@@ -127,7 +138,7 @@ router.get('/members', authMiddleware, requireOrganization, async (req, res) => 
     }
 });
 
-router.post('/members', authMiddleware, requireOrganization, requireOrganizationAdmin, [
+router.post('/members', authMiddleware, requireOrganization, requireOrganizationAdmin, requireActiveSubscription, enforceLimit('members'), [
     body('username').trim().isLength({ min: 3 }),
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),

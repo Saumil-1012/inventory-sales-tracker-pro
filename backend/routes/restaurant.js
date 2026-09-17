@@ -2,9 +2,11 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authMiddleware } = require('../middleware/auth');
 const { getPool } = require('../db/postgres');
+const { requireActiveSubscription, enforceLimit } = require('../middleware/subscription');
 
 const router = express.Router();
 router.use(authMiddleware);
+router.use(requireActiveSubscription);
 
 router.get('/ingredients', async (req, res) => {
     try {
@@ -18,7 +20,7 @@ router.get('/ingredients', async (req, res) => {
     }
 });
 
-router.post('/ingredients', [
+router.post('/ingredients', enforceLimit('ingredients'), [
     body('name').trim().notEmpty(),
     body('sku').trim().notEmpty(),
     body('unit').trim().notEmpty(),
