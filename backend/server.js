@@ -3,11 +3,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
 
+const db = require('./db/database');
 const authRoutes = require('./routes/auth');
 const inventoryRoutes = require('./routes/inventory');
 const salesRoutes = require('./routes/sales');
 const analyticsRoutes = require('./routes/analytics');
-const db = require('./db/database');
 
 const app = express();
 
@@ -16,9 +16,6 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Initialize database
-db.initialize();
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -46,7 +43,16 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`✓ Server running on http://localhost:${PORT}`);
-    console.log(`✓ API docs: http://localhost:${PORT}/api/docs`);
-});
+
+// Initialize database then start server
+db.initializeDb()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`✓ Server running on http://localhost:${PORT}`);
+            console.log(`✓ API: http://localhost:${PORT}/api`);
+        });
+    })
+    .catch((err) => {
+        console.error('Failed to initialize database:', err);
+        process.exit(1);
+    });

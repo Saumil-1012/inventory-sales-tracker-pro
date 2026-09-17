@@ -1,36 +1,36 @@
 const express = require('express');
-const db = require('../db/database');
-const { staffOrAdmin } = require('../middleware/auth');
+const dbModule = require('../db/database');
+const { authMiddleware, staffOrAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Dashboard stats
-router.get('/dashboard', staffOrAdmin, async (req, res) => {
+router.get('/dashboard', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
         // Total products
-        const productsCount = await db.get(
+        const productsCount = await dbModule.get(
             'SELECT COUNT(*) as count FROM products'
         );
 
         // Low stock items
-        const lowStock = await db.get(
+        const lowStock = await dbModule.get(
             'SELECT COUNT(*) as count FROM products WHERE quantity < min_stock'
         );
 
         // Today's sales
-        const todaySales = await db.get(
+        const todaySales = await dbModule.get(
             `SELECT COUNT(*) as count, SUM(total_amount) as total FROM sales 
              WHERE DATE(created_at) = DATE('now')`
         );
 
         // This week's sales
-        const weekSales = await db.get(
+        const weekSales = await dbModule.get(
             `SELECT SUM(total_amount) as total FROM sales 
              WHERE created_at >= datetime('now', '-7 days')`
         );
 
         // Total inventory value
-        const inventoryValue = await db.get(
+        const inventoryValue = await dbModule.get(
             'SELECT SUM(price * quantity) as total FROM products'
         );
 
@@ -48,11 +48,11 @@ router.get('/dashboard', staffOrAdmin, async (req, res) => {
 });
 
 // Top selling products
-router.get('/top-products', staffOrAdmin, async (req, res) => {
+router.get('/top-products', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
         const { limit = 10, days = 30 } = req.query;
 
-        const products = await db.all(
+        const products = await dbModule.all(
             `SELECT p.id, p.name, p.sku, SUM(s.quantity) as total_sold, SUM(s.total_amount) as revenue
              FROM sales s
              JOIN products p ON s.product_id = p.id
@@ -70,11 +70,11 @@ router.get('/top-products', staffOrAdmin, async (req, res) => {
 });
 
 // Daily sales trend
-router.get('/sales-trend/:days', staffOrAdmin, async (req, res) => {
+router.get('/sales-trend/:days', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
         const { days } = req.params;
 
-        const trend = await db.all(
+        const trend = await dbModule.all(
             `SELECT DATE(created_at) as date, COUNT(*) as transactions, SUM(total_amount) as revenue
              FROM sales
              WHERE created_at >= datetime('now', ? || ' days')
@@ -90,12 +90,12 @@ router.get('/sales-trend/:days', staffOrAdmin, async (req, res) => {
 });
 
 // Stock movement history
-router.get('/stock-history/:product_id', staffOrAdmin, async (req, res) => {
+router.get('/stock-history/:product_id', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
         const { product_id } = req.params;
         const { limit = 50 } = req.query;
 
-        const history = await db.all(
+        const history = await dbModule.all(
             `SELECT sm.*, u.username FROM stock_movements sm
              LEFT JOIN users u ON sm.user_id = u.id
              WHERE sm.product_id = ?
@@ -111,9 +111,9 @@ router.get('/stock-history/:product_id', staffOrAdmin, async (req, res) => {
 });
 
 // Category-wise sales
-router.get('/category-breakdown', staffOrAdmin, async (req, res) => {
+router.get('/category-breakdown', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
-        const breakdown = await db.all(
+        const breakdown = await dbModule.all(
             `SELECT p.category, COUNT(*) as transactions, SUM(s.total_amount) as revenue
              FROM sales s
              JOIN products p ON s.product_id = p.id

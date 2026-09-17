@@ -1,12 +1,12 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const db = require('../db/database');
+const dbModule = require('../db/database');
 const { authMiddleware, adminOnly, staffOrAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Get all products
-router.get('/', staffOrAdmin, async (req, res) => {
+router.get('/', authMiddleware, staffOrAdmin, async (req, res) => {
     try {
         const { category, low_stock } = req.query;
         let query = 'SELECT * FROM products WHERE 1=1';
@@ -23,7 +23,7 @@ router.get('/', staffOrAdmin, async (req, res) => {
 
         query += ' ORDER BY name ASC';
 
-        const products = await db.all(query, params);
+        const products = await dbModule.all(query, params);
         res.json(products);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -33,7 +33,7 @@ router.get('/', staffOrAdmin, async (req, res) => {
 // Get single product
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
-        const product = await db.get(
+        const product = await dbModule.get(
             'SELECT * FROM products WHERE id = ?',
             [req.params.id]
         );
@@ -50,7 +50,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.get('/search/:query', authMiddleware, async (req, res) => {
     try {
         const { query } = req.params;
-        const products = await db.all(
+        const products = await dbModule.all(
             `SELECT * FROM products WHERE sku LIKE ? OR barcode LIKE ? OR name LIKE ?`,
             [`%${query}%`, `%${query}%`, `%${query}%`]
         );
@@ -61,7 +61,7 @@ router.get('/search/:query', authMiddleware, async (req, res) => {
 });
 
 // Create product (Admin only)
-router.post('/', adminOnly, [
+router.post('/', authMiddleware, adminOnly, [
     body('sku').notEmpty().withMessage('SKU required'),
     body('name').notEmpty().withMessage('Name required'),
     body('price').isFloat({ min: 0 }).withMessage('Valid price required'),
@@ -75,7 +75,7 @@ router.post('/', adminOnly, [
     const { sku, name, description, category, price, quantity, min_stock, max_stock, supplier_id, barcode } = req.body;
 
     try {
-        const result = await db.run(
+        const result = await dbModule.run(
             `INSERT INTO products (sku, name, description, category, price, quantity, min_stock, max_stock, supplier_id, barcode)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [sku, name, description, category, price, quantity, min_stock || 10, max_stock || 1000, supplier_id, barcode]
@@ -95,7 +95,7 @@ router.post('/', adminOnly, [
 });
 
 // Update product (Admin only)
-router.put('/:id', adminOnly, async (req, res) => {
+router.put('/:id', authMiddleware, adminOnly, async (req, res) => {
     const { name, price, min_stock, max_stock, category, description } = req.body;
     const updates = [];
     const params = [];
@@ -115,7 +115,7 @@ router.put('/:id', adminOnly, async (req, res) => {
     params.push(req.params.id);
 
     try {
-        await db.run(
+        await dbModule.run(
             `UPDATE products SET ${updates.join(', ')} WHERE id = ?`,
             params
         );
@@ -126,9 +126,9 @@ router.put('/:id', adminOnly, async (req, res) => {
 });
 
 // Delete product (Admin only)
-router.delete('/:id', adminOnly, async (req, res) => {
+router.delete('/:id', authMiddleware, adminOnly, async (req, res) => {
     try {
-        await db.run('DELETE FROM products WHERE id = ?', [req.params.id]);
+        await dbModule.run('DELETE FROM products WHERE id = ?', [req.params.id]);
         res.json({ message: 'Product deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -149,13 +149,13 @@ router.post('/:id/adjust-stock', authMiddleware, [
 
     try {
         // Update product quantity
-        await db.run(
+        await dbModule.run(
             'UPDATE products SET quantity = quantity + ? WHERE id = ?',
             [quantity_change, req.params.id]
         );
 
         // Log stock movement
-        await db.run(
+        await dbModule.run(
             'INSERT INTO stock_movements (product_id, quantity_change, movement_type, reason, user_id) VALUES (?, ?, ?, ?, ?)',
             [req.params.id, quantity_change, quantity_change > 0 ? 'IN' : 'OUT', reason, req.user.id]
         );

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const db = require('../db/database');
+const dbModule = require('../db/database');
 const config = require('../config');
 
 const router = express.Router();
@@ -22,8 +22,9 @@ router.post('/register', [
 
     try {
         const hash = await bcrypt.hash(password, config.BCRYPT_ROUNDS);
+        const db = dbModule.db();
         
-        const result = await db.run(
+        const result = await dbModule.run(
             `INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, ?)`,
             [username, hash, email, role]
         );
@@ -49,7 +50,7 @@ router.post('/login', [
     const { username, password } = req.body;
 
     try {
-        const user = await db.get(
+        const user = await dbModule.get(
             `SELECT id, username, password_hash, role FROM users WHERE username = ?`,
             [username]
         );
