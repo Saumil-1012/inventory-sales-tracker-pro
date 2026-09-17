@@ -91,3 +91,5 @@ DATABASE_URL=postgresql://inventory_user:change-me@localhost:5432/inventory_saas
 ```
 
 The existing SQLite demo remains the default local development mode while tenant-aware query wiring and Stripe checkout are completed. Do not use the SQLite mode for production customer data.
+
+Organization accounts use the PostgreSQL SaaS APIs. The legacy SQLite inventory, sales, analytics, purchasing, locations, and operations endpoints reject organization tokens so demo data cannot leak between tenants.

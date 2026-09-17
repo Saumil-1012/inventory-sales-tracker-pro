@@ -31,8 +31,21 @@ const staffOrAdmin = (req, res, next) => {
     next();
 };
 
+const demoOnly = (req, res, next) => {
+    authMiddleware(req, res, () => {
+        if (req.user?.organizationId) {
+            return res.status(403).json({
+                error: 'This legacy demo endpoint is not available for organization accounts',
+                code: 'USE_SAAS_API'
+            });
+        }
+        next();
+    });
+};
+
 module.exports = {
     authMiddleware,
     adminOnly,
-    staffOrAdmin
+    staffOrAdmin,
+    demoOnly
 };

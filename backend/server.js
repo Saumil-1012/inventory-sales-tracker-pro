@@ -16,6 +16,7 @@ const operationsRoutes = require('./routes/operations');
 const saasRoutes = require('./routes/saas');
 const billingRoutes = require('./routes/billing');
 const restaurantRoutes = require('./routes/restaurant');
+const { demoOnly } = require('./middleware/auth');
 
 const app = express();
 
@@ -29,12 +30,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/inventory', inventoryRoutes);
-app.use('/api/sales', salesRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/purchasing', purchasingRoutes);
-app.use('/api/locations', locationRoutes);
-app.use('/api/operations', operationsRoutes);
+app.use('/api/inventory', demoOnly, inventoryRoutes);
+app.use('/api/sales', demoOnly, salesRoutes);
+app.use('/api/analytics', demoOnly, analyticsRoutes);
+app.use('/api/purchasing', demoOnly, purchasingRoutes);
+app.use('/api/locations', demoOnly, locationRoutes);
+app.use('/api/operations', demoOnly, operationsRoutes);
 app.use('/api/saas', saasRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/restaurant', restaurantRoutes);
