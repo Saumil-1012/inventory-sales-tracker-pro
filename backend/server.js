@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const config = require('./config');
 
 const db = require('./db/database');
 const authRoutes = require('./routes/auth');
@@ -19,7 +21,8 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({ origin: config.CORS_ORIGIN.split(',').map((origin) => origin.trim()) }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-7', legacyHeaders: false }));
 app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

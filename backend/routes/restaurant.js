@@ -131,4 +131,42 @@ router.get('/waste', async (req, res) => {
     }
 });
 
+router.get('/report', async (req, res) => {
+    try {
+        const [ingredients, waste, recipes] = await Promise.all([
+            getPool().query(`SELECT COUNT(*)::int as count, COALESCE(SUM(quantity * cost_per_unit), 0) as inventory_cost FROM ingredients WHERE organization_id = $1`, [req.user.organizationId]),
+            getPool().query(`SELECT COUNT(*)::int as events, COALESCE(SUM(cost), 0) as waste_cost FROM waste_events WHERE organization_id = $1 AND created_at >= NOW() - INTERVAL '30 days'`, [req.user.organizationId]),
+            getPool().query(`SELECT COUNT(*)::int as count, COALESCE(AVG((selling_price - food_cost) / NULLIF(selling_price, 0) * 100), 0) as average_margin FROM (SELECT r.selling_price, COALESCE(SUM(ri.quantity * i.cost_per_unit), 0) as food_cost FROM recipes r LEFT JOIN recipe_items ri ON ri.recipe_id = r.id LEFT JOIN ingredients i ON i.id = ri.ingredient_id WHERE r.organization_id = $1 GROUP BY r.id) recipe_costs`, [req.user.organizationId])
+        ]);
+        res.json({ period: '30 days', ingredients: ingredients.rows[0], waste: waste.rows[0], recipes: recipes.rows[0] });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/notifications', async (req, res) => {
+    try {
+        const result = await getPool().query(`SELECT * FROM organization_notification_settings WHERE organization_id = $1`, [req.user.organizationId]);
+        res.json(result.rows[0] || { low_stock_enabled: true, waste_alerts_enabled: true, weekly_report_enabled: false, report_email: null });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.put('/notifications', async (req, res) => {
+    const { low_stock_enabled = true, waste_alerts_enabled = true, weekly_report_enabled = false, report_email = null } = req.body;
+    try {
+        const result = await getPool().query(`
+            INSERT INTO organization_notification_settings (organization_id, low_stock_enabled, waste_alerts_enabled, weekly_report_enabled, report_email)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (organization_id) DO UPDATE SET low_stock_enabled = EXCLUDED.low_stock_enabled, waste_alerts_enabled = EXCLUDED.waste_alerts_enabled, weekly_report_enabled = EXCLUDED.weekly_report_enabled, report_email = EXCLUDED.report_email, updated_at = NOW()
+            RETURNING *`,
+            [req.user.organizationId, low_stock_enabled, waste_alerts_enabled, weekly_report_enabled, report_email]
+        );
+        res.json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

@@ -16,4 +16,10 @@ module.exports = {
     ,STRIPE_PRICE_ENTERPRISE: process.env.STRIPE_PRICE_ENTERPRISE || ''
     ,STRIPE_SUCCESS_URL: process.env.STRIPE_SUCCESS_URL || 'http://localhost:3000/settings?billing=success'
     ,STRIPE_CANCEL_URL: process.env.STRIPE_CANCEL_URL || 'http://localhost:3000/settings?billing=cancelled'
+    ,CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000'
+    ,SMTP_HOST: process.env.SMTP_HOST || ''
+    ,SMTP_PORT: Number(process.env.SMTP_PORT || 587)
+    ,SMTP_USER: process.env.SMTP_USER || ''
+    ,SMTP_PASSWORD: process.env.SMTP_PASSWORD || ''
+    ,REPORT_EMAIL_FROM: process.env.REPORT_EMAIL_FROM || 'reports@example.com'
 };
