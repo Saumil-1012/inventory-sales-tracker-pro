@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: inventory-api
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_PATH: ./data/inventory.db
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_EXPIRE: 7d
+    volumes:
+      - ./backend/data:/app/backend/data
+    restart: unless-stopped
+    networks:
+      - inventory-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Optional: PostgreSQL for production (replace SQLite)
+  # db:
+  #   image: postgres:16-alpine
+  #   container_name: inventory-db
+  #   environment:
+  #     POSTGRES_USER: inventory_user
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+  #     POSTGRES_DB: inventory_db
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - inventory-network
+  #   restart: unless-stopped
+
+networks:
+  inventory-network:
+    driver: bridge
+
+volumes:
+  pgdata:
