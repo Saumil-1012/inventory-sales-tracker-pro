@@ -79,3 +79,15 @@ docker compose up --build
 ```
 
 For production, set a strong `JWT_SECRET` and use a managed database instead of the local SQLite file.
+
+## SaaS Production Foundation
+
+The repository includes a PostgreSQL service, tenant/subscription schema, recipe and ingredient schema, and a migration runner. To apply the PostgreSQL foundation locally:
+
+```bash
+docker compose up -d db
+cd backend
+DATABASE_URL=postgresql://inventory_user:change-me@localhost:5432/inventory_saas npm run migrate:postgres
+```
+
+The existing SQLite demo remains the default local development mode while tenant-aware query wiring and Stripe checkout are completed. Do not use the SQLite mode for production customer data.

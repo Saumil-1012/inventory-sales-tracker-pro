@@ -11,12 +11,16 @@ const analyticsRoutes = require('./routes/analytics');
 const purchasingRoutes = require('./routes/purchasing');
 const locationRoutes = require('./routes/locations');
 const operationsRoutes = require('./routes/operations');
+const saasRoutes = require('./routes/saas');
+const billingRoutes = require('./routes/billing');
+const restaurantRoutes = require('./routes/restaurant');
 
 const app = express();
 
 // Middleware
 app.use(helmet());
 app.use(cors());
+app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -28,6 +32,9 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/purchasing', purchasingRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/operations', operationsRoutes);
+app.use('/api/saas', saasRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/restaurant', restaurantRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

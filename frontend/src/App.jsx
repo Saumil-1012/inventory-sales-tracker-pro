@@ -11,14 +11,16 @@ import Purchasing from './pages/Purchasing';
 import Locations from './pages/Locations';
 import Operations from './pages/Operations';
 import Settings from './pages/Settings';
+import SaaSPortal from './pages/SaaSPortal';
 import './App.css';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
   const [loading, setLoading] = useState(false);
+  const [authMode, setAuthMode] = useState('demo');
 
   // Setup axios interceptor
   useEffect(() => {
@@ -56,7 +58,10 @@ function App() {
   };
 
   if (!token) {
-    return <Login onLogin={handleLogin} loading={loading} />;
+    if (authMode === 'saas') {
+      return <SaaSPortal apiUrl={API_URL} onBackToLogin={() => setAuthMode('demo')} />;
+    }
+    return <Login onLogin={handleLogin} loading={loading} onSaaSPortal={() => setAuthMode('saas')} />;
   }
 
   return (
@@ -73,6 +78,7 @@ function App() {
             <Route path="/locations" element={<Locations apiUrl={API_URL} />} />
             <Route path="/operations" element={<Operations apiUrl={API_URL} user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
+            <Route path="/saas" element={<SaaSPortal apiUrl={API_URL} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

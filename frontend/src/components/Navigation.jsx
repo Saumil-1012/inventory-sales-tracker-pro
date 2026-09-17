@@ -18,6 +18,7 @@ function Navigation({ user, onLogout }) {
         <li><Link to="/locations">Locations</Link></li>
         <li><Link to="/operations">Operations</Link></li>
         <li><Link to="/settings">Settings</Link></li>
+        <li><Link to="/saas">SaaS Portal</Link></li>
       </ul>
 
       <div className="nav-user">

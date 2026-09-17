@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './Login.css';
 
-function Login({ onLogin, loading }) {
+function Login({ onLogin, loading, onSaaSPortal }) {
   const [username, setUsername] = useState('admin1');
   const [password, setPassword] = useState('admin12345');
 
@@ -51,6 +51,9 @@ function Login({ onLogin, loading }) {
           <p>Admin: admin1 / admin12345</p>
           <p>Staff: staff1 / staff123</p>
         </div>
+        <button type="button" className="saas-entry-btn" onClick={onSaaSPortal}>
+          Start a restaurant workspace
+        </button>
       </div>
     </div>
   );

@@ -1,0 +1,19 @@
+.saas-portal h1 { margin-bottom: 6px; }
+.saas-header { display:flex; justify-content:space-between; align-items:center; gap:20px; margin-bottom:24px; }
+.saas-header p { color:#667085; }
+.saas-header-actions { display:flex; align-items:center; gap:10px; }
+.saas-message { padding:10px 14px; border-radius:4px; background:#e6f4ea; color:#176b2c; }
+.saas-panel { background:white; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.1); margin-bottom:20px; }
+.saas-panel h2 { font-size:18px; margin-bottom:16px; }
+.saas-form { display:grid; gap:10px; max-width:520px; }
+.saas-form input, .saas-form select { padding:10px; border:1px solid #d0d5dd; border-radius:4px; font:inherit; }
+.plan-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px; margin-bottom:20px; }
+.plan-card { background:white; padding:20px; border:1px solid #d0d5dd; border-top:3px solid #007bff; border-radius:6px; }
+.plan-card h3 { margin-bottom:12px; }
+.plan-card ul { min-height:70px; padding-left:20px; margin-bottom:14px; color:#667085; }
+.saas-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px; }
+.account-panel { border-left:4px solid #007bff; }
+.saas-table { overflow-x:auto; }
+.saas-table table { width:100%; border-collapse:collapse; }
+.saas-table th, .saas-table td { padding:12px; text-align:left; border-bottom:1px solid #eaecf0; }
+@media (max-width:800px) { .plan-grid, .saas-grid { grid-template-columns:1fr; } .saas-header { display:block; } .saas-header-actions { display:block; margin-top:12px; } .saas-message { display:inline-block; margin-top:12px; } }

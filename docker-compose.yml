@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api:
     build:
@@ -14,11 +12,17 @@ services:
       DB_PATH: ./data/inventory.db
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       JWT_EXPIRE: 7d
+      DATABASE_URL: postgresql://inventory_user:change-me@db:5432/inventory_saas
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_replace_me}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_replace_me}
     volumes:
       - ./backend/data:/app/backend/data
     restart: unless-stopped
     networks:
       - inventory-network
+    depends_on:
+      db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
       interval: 30s
@@ -26,19 +30,25 @@ services:
       retries: 3
       start_period: 5s
 
-  # Optional: PostgreSQL for production (replace SQLite)
-  # db:
-  #   image: postgres:16-alpine
-  #   container_name: inventory-db
-  #   environment:
-  #     POSTGRES_USER: inventory_user
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
-  #     POSTGRES_DB: inventory_db
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   networks:
-  #     - inventory-network
-  #   restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    container_name: inventory-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+      POSTGRES_DB: inventory_saas
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - inventory-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inventory_user -d inventory_saas"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   inventory-network:
