@@ -1,5 +1,40 @@
+# Dependencies
 node_modules/
-*.o
-inventory_tracker
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.db-journal
+data/
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.exe
+inventory_tracker
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
+
+# Logs
+logs/
+*.log
+
+# Backup
+backup/
+*.bak
