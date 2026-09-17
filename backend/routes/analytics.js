@@ -89,6 +89,131 @@ router.get('/sales-trend/:days', authMiddleware, staffOrAdmin, async (req, res) 
     }
 });
 
+// Profit and margin report
+router.get('/profit', authMiddleware, staffOrAdmin, async (req, res) => {
+    try {
+        const days = Math.max(parseInt(req.query.days || '30', 10), 1);
+        const summary = await dbModule.get(
+            `SELECT
+                COALESCE(SUM(total_amount), 0) as revenue,
+                COALESCE(SUM(quantity * cost_price), 0) as cost,
+                COALESCE(SUM(quantity * (price_per_unit - cost_price)), 0) as profit
+             FROM sales
+             WHERE status = 'COMPLETED' AND created_at >= datetime('now', ? || ' days')`,
+            [`-${days}`]
+        );
+
+        const products = await dbModule.all(
+            `SELECT p.name, p.sku, p.category,
+                SUM(s.quantity) as units_sold,
+                SUM(s.total_amount) as revenue,
+                SUM(s.quantity * s.cost_price) as cost,
+                SUM(s.quantity * (s.price_per_unit - s.cost_price)) as profit
+             FROM sales s
+             JOIN products p ON p.id = s.product_id
+             WHERE s.status = 'COMPLETED' AND s.created_at >= datetime('now', ? || ' days')
+             GROUP BY p.id
+             ORDER BY profit DESC`,
+            [`-${days}`]
+        );
+
+        const categories = await dbModule.all(
+            `SELECT COALESCE(p.category, 'Uncategorized') as category,
+                SUM(s.total_amount) as revenue,
+                SUM(s.quantity * (s.price_per_unit - s.cost_price)) as profit
+             FROM sales s
+             JOIN products p ON p.id = s.product_id
+             WHERE s.status = 'COMPLETED' AND s.created_at >= datetime('now', ? || ' days')
+             GROUP BY p.category
+             ORDER BY profit DESC`,
+            [`-${days}`]
+        );
+
+        res.json({
+            days,
+            summary: {
+                revenue: summary.revenue,
+                cost: summary.cost,
+                profit: summary.profit,
+                marginPercent: summary.revenue ? (summary.profit / summary.revenue) * 100 : 0
+            },
+            products: products.map((product) => ({
+                ...product,
+                marginPercent: product.revenue ? (product.profit / product.revenue) * 100 : 0
+            })),
+            categories: categories.map((category) => ({
+                ...category,
+                marginPercent: category.revenue ? (category.profit / category.revenue) * 100 : 0
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Inventory health and ABC classification
+router.get('/inventory-intelligence', authMiddleware, staffOrAdmin, async (req, res) => {
+    try {
+        const days = Math.max(parseInt(req.query.days || '90', 10), 1);
+        const products = await dbModule.all(
+            `SELECT p.id, p.sku, p.name, p.category, p.price, p.cost_price,
+                p.quantity, p.min_stock,
+                COALESCE(SUM(s.quantity), 0) as units_sold,
+                COALESCE(SUM(s.total_amount), 0) as revenue
+             FROM products p
+             LEFT JOIN sales s ON s.product_id = p.id
+                AND s.status = 'COMPLETED'
+                AND s.created_at >= datetime('now', ? || ' days')
+             GROUP BY p.id
+             ORDER BY revenue DESC, p.name ASC`,
+            [`-${days}`]
+        );
+
+        const totalRevenue = products.reduce((sum, product) => sum + product.revenue, 0);
+        let cumulativeRevenue = 0;
+        const report = products.map((product) => {
+            const averageDailySales = product.units_sold / days;
+            const daysOfStock = averageDailySales > 0 ? product.quantity / averageDailySales : null;
+            const averageInventory = (product.quantity + product.units_sold) / 2;
+            const turnoverRate = averageInventory > 0
+                ? (product.units_sold / averageInventory) * (365 / days)
+                : 0;
+            cumulativeRevenue += product.revenue;
+            const revenueShare = totalRevenue > 0 ? (product.revenue / totalRevenue) * 100 : 0;
+            const cumulativeShare = totalRevenue > 0 ? (cumulativeRevenue / totalRevenue) * 100 : 0;
+
+            return {
+                ...product,
+                inventory_value: product.price * product.quantity,
+                average_daily_sales: averageDailySales,
+                days_of_stock: daysOfStock,
+                turnover_rate: turnoverRate,
+                revenue_share: revenueShare,
+                abc_class: cumulativeShare <= 80 ? 'A' : cumulativeShare <= 95 ? 'B' : 'C',
+                dead_stock: product.units_sold === 0,
+                understock: product.quantity <= product.min_stock || (daysOfStock !== null && daysOfStock <= 14),
+                overstock: daysOfStock === null || daysOfStock > 90
+            };
+        });
+
+        res.json({
+            days,
+            summary: {
+                inventoryValue: report.reduce((sum, product) => sum + product.inventory_value, 0),
+                deadStock: report.filter((product) => product.dead_stock).length,
+                understock: report.filter((product) => product.understock).length,
+                overstock: report.filter((product) => product.overstock).length,
+                averageTurnover: report.length
+                    ? report.reduce((sum, product) => sum + product.turnover_rate, 0) / report.length
+                    : 0
+            },
+            products: report
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Stock movement history
 router.get('/stock-history/:product_id', authMiddleware, staffOrAdmin, async (req, res) => {
     try {

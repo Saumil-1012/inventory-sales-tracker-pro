@@ -14,6 +14,9 @@ function Navigation({ user, onLogout }) {
         <li><Link to="/inventory">Inventory</Link></li>
         <li><Link to="/sales">Sales</Link></li>
         <li><Link to="/analytics">Analytics</Link></li>
+        <li><Link to="/purchasing">Purchasing</Link></li>
+        <li><Link to="/locations">Locations</Link></li>
+        <li><Link to="/operations">Operations</Link></li>
         <li><Link to="/settings">Settings</Link></li>
       </ul>
 

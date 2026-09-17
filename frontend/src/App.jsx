@@ -7,6 +7,9 @@ import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
 import Sales from './pages/Sales';
 import Analytics from './pages/Analytics';
+import Purchasing from './pages/Purchasing';
+import Locations from './pages/Locations';
+import Operations from './pages/Operations';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -66,6 +69,9 @@ function App() {
             <Route path="/inventory" element={<Inventory apiUrl={API_URL} user={user} />} />
             <Route path="/sales" element={<Sales apiUrl={API_URL} user={user} />} />
             <Route path="/analytics" element={<Analytics apiUrl={API_URL} />} />
+            <Route path="/purchasing" element={<Purchasing apiUrl={API_URL} />} />
+            <Route path="/locations" element={<Locations apiUrl={API_URL} />} />
+            <Route path="/operations" element={<Operations apiUrl={API_URL} user={user} />} />
             <Route path="/settings" element={<Settings user={user} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

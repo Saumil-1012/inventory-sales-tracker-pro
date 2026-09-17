@@ -25,7 +25,7 @@ const adminOnly = (req, res, next) => {
 };
 
 const staffOrAdmin = (req, res, next) => {
-    if (!['ADMIN', 'STAFF'].includes(req.user?.role)) {
+    if (!['ADMIN', 'MANAGER', 'STAFF', 'WAREHOUSE'].includes(req.user?.role)) {
         return res.status(403).json({ error: 'Access denied' });
     }
     next();

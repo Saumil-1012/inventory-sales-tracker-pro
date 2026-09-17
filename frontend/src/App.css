@@ -10,6 +10,21 @@ body {
   color: #333;
 }
 
+body.dark-mode {
+  background: #1f2430;
+  color: #e8edf5;
+}
+
+body.dark-mode .settings-section,
+body.dark-mode .settings-modal-content {
+  background: #2b3242;
+  color: #e8edf5;
+}
+
+body.dark-mode .settings-group p {
+  color: #e8edf5;
+}
+
 .app {
   display: flex;
   flex-direction: column;

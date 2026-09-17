@@ -7,6 +7,8 @@ function Analytics({ apiUrl }) {
   const [salesTrend, setSalesTrend] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [categoryBreakdown, setCategoryBreakdown] = useState([]);
+  const [profitReport, setProfitReport] = useState({ summary: {}, products: [] });
+  const [inventoryIntelligence, setInventoryIntelligence] = useState({ summary: {}, products: [] });
   const [selectedDays, setSelectedDays] = useState(30);
   const [loading, setLoading] = useState(true);
 
@@ -16,15 +18,19 @@ function Analytics({ apiUrl }) {
 
   const fetchAnalytics = async () => {
     try {
-      const [trendRes, topRes, categoryRes] = await Promise.all([
+      const [trendRes, topRes, categoryRes, profitRes] = await Promise.all([
         axios.get(`${apiUrl}/analytics/sales-trend/${selectedDays}`),
         axios.get(`${apiUrl}/analytics/top-products?days=${selectedDays}&limit=10`),
-        axios.get(`${apiUrl}/analytics/category-breakdown`)
+        axios.get(`${apiUrl}/analytics/category-breakdown`),
+        axios.get(`${apiUrl}/analytics/profit?days=${selectedDays}`),
+        axios.get(`${apiUrl}/analytics/inventory-intelligence?days=${selectedDays}`)
       ]);
 
       setSalesTrend(trendRes.data);
       setTopProducts(topRes.data);
       setCategoryBreakdown(categoryRes.data);
+      setProfitReport(profitRes.data);
+      setInventoryIntelligence(inventoryRes.data);
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
     } finally {
@@ -69,6 +75,22 @@ function Analytics({ apiUrl }) {
         <div className="stat-box">
           <h3>Top Product</h3>
           <p className="stat-number">{topProducts[0]?.name || 'N/A'}</p>
+        </div>
+        <div className="stat-box">
+          <h3>Gross Profit</h3>
+          <p className="stat-number">${(profitReport.summary.profit || 0).toFixed(2)}</p>
+        </div>
+        <div className="stat-box">
+          <h3>Profit Margin</h3>
+          <p className="stat-number">{(profitReport.summary.marginPercent || 0).toFixed(1)}%</p>
+        </div>
+        <div className="stat-box">
+          <h3>Dead Stock</h3>
+          <p className="stat-number">{inventoryIntelligence.summary.deadStock || 0}</p>
+        </div>
+        <div className="stat-box">
+          <h3>Understock</h3>
+          <p className="stat-number">{inventoryIntelligence.summary.understock || 0}</p>
         </div>
       </div>
 
@@ -154,6 +176,9 @@ function Analytics({ apiUrl }) {
               <th>SKU</th>
               <th>Units Sold</th>
               <th>Revenue</th>
+              <th>Cost</th>
+              <th>Gross Profit</th>
+              <th>Margin</th>
               <th>Avg Price</th>
             </tr>
           </thead>
@@ -164,7 +189,39 @@ function Analytics({ apiUrl }) {
                 <td><code>{p.sku}</code></td>
                 <td>{p.total_sold}</td>
                 <td>${p.revenue.toFixed(2)}</td>
+                <td>${(profitReport.products.find((product) => product.sku === p.sku)?.cost || 0).toFixed(2)}</td>
+                <td>${(profitReport.products.find((product) => product.sku === p.sku)?.profit || 0).toFixed(2)}</td>
+                <td>{(profitReport.products.find((product) => product.sku === p.sku)?.marginPercent || 0).toFixed(1)}%</td>
                 <td>${(p.revenue / p.total_sold).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="detailed-products">
+        <h2>Inventory Intelligence ({selectedDays} days)</h2>
+        <p>ABC class is based on revenue contribution. Days of stock uses the selected period's average daily sales.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Stock</th>
+              <th>Days of Stock</th>
+              <th>Turnover</th>
+              <th>ABC</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inventoryIntelligence.products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>{product.quantity}</td>
+                <td>{product.days_of_stock === null ? 'No sales' : `${product.days_of_stock.toFixed(1)} days`}</td>
+                <td>{product.turnover_rate.toFixed(2)}x</td>
+                <td>{product.abc_class}</td>
+                <td>{product.dead_stock ? 'Dead stock' : product.understock ? 'Understock' : product.overstock ? 'Overstock' : 'Healthy'}</td>
               </tr>
             ))}
           </tbody>

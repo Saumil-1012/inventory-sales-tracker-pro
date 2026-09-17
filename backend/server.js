@@ -8,6 +8,9 @@ const authRoutes = require('./routes/auth');
 const inventoryRoutes = require('./routes/inventory');
 const salesRoutes = require('./routes/sales');
 const analyticsRoutes = require('./routes/analytics');
+const purchasingRoutes = require('./routes/purchasing');
+const locationRoutes = require('./routes/locations');
+const operationsRoutes = require('./routes/operations');
 
 const app = express();
 
@@ -22,6 +25,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/purchasing', purchasingRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/operations', operationsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

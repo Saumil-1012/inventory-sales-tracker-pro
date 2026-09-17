@@ -1,0 +1,19 @@
+.purchasing h1 { margin-bottom: 6px; }
+.purchasing-header { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 24px; }
+.purchasing-header p { color: #667085; }
+.purchasing-message { padding: 10px 14px; background: #e6f4ea; color: #176b2c; border-radius: 4px; }
+.purchasing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-bottom: 20px; }
+.purchasing-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); margin-bottom: 20px; }
+.purchasing-panel h2 { font-size: 18px; margin-bottom: 16px; }
+.purchasing-panel form { display: grid; gap: 10px; }
+.purchasing-panel input, .purchasing-panel select { padding: 10px; border: 1px solid #d0d5dd; border-radius: 4px; font: inherit; }
+.supplier-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.supplier-card { display: grid; gap: 6px; padding: 14px; border: 1px solid #e4e7ec; border-left: 3px solid #007bff; border-radius: 4px; }
+.supplier-card span { color: #667085; font-size: 13px; }
+.orders-table { overflow-x: auto; }
+.orders-table table { width: 100%; border-collapse: collapse; }
+.orders-table th, .orders-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eaecf0; }
+.order-status { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #f2f4f7; }
+.order-status.received { color: #176b2c; background: #e6f4ea; }
+.action-btn { padding: 7px 10px; border: 0; border-radius: 4px; cursor: pointer; background: #e8f1ff; color: #0759b8; }
+@media (max-width: 768px) { .purchasing-grid { grid-template-columns: 1fr; } .purchasing-header { display: block; } .purchasing-message { display: inline-block; margin-top: 12px; } }

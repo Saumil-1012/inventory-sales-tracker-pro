@@ -17,6 +17,7 @@ function Inventory({ apiUrl, user }) {
     name: '',
     category: '',
     price: '',
+    cost_price: '',
     quantity: '',
     min_stock: '10',
   });
@@ -70,7 +71,7 @@ function Inventory({ apiUrl, user }) {
       });
 
       alert('Product added successfully');
-      setFormData({ sku: '', name: '', category: '', price: '', quantity: '', min_stock: '10' });
+      setFormData({ sku: '', name: '', category: '', price: '', cost_price: '', quantity: '', min_stock: '10' });
       setShowAddForm(false);
       fetchProducts();
     } catch (error) {
@@ -184,6 +185,15 @@ function Inventory({ apiUrl, user }) {
                 step="0.01"
                 required
               />
+              <input
+                type="number"
+                placeholder="Cost Price"
+                value={formData.cost_price}
+                onChange={(e) => setFormData({ ...formData, cost_price: e.target.value })}
+                step="0.01"
+                min="0"
+                required
+              />
             </div>
             <div className="form-row">
               <input
@@ -217,6 +227,8 @@ function Inventory({ apiUrl, user }) {
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Cost</th>
+              <th>Margin</th>
               <th>Quantity</th>
               <th>Status</th>
               <th>Actions</th>
@@ -229,6 +241,8 @@ function Inventory({ apiUrl, user }) {
                 <td>{product.name}</td>
                 <td>{product.category || '-'}</td>
                 <td>${product.price.toFixed(2)}</td>
+                <td>${(product.cost_price || 0).toFixed(2)}</td>
+                <td>{product.price ? (((product.price - (product.cost_price || 0)) / product.price) * 100).toFixed(1) : '0.0'}%</td>
                 <td>{product.quantity}</td>
                 <td>
                   {product.quantity < product.min_stock ? (

@@ -65,6 +65,7 @@ router.post('/', authMiddleware, adminOnly, [
     body('sku').notEmpty().withMessage('SKU required'),
     body('name').notEmpty().withMessage('Name required'),
     body('price').isFloat({ min: 0 }).withMessage('Valid price required'),
+    body('cost_price').isFloat({ min: 0 }).withMessage('Valid cost price required'),
     body('quantity').isInt({ min: 0 }).withMessage('Valid quantity required')
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -72,13 +73,13 @@ router.post('/', authMiddleware, adminOnly, [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { sku, name, description, category, price, quantity, min_stock, max_stock, supplier_id, barcode } = req.body;
+    const { sku, name, description, category, price, cost_price, quantity, min_stock, max_stock, supplier_id, barcode } = req.body;
 
     try {
         const result = await dbModule.run(
-            `INSERT INTO products (sku, name, description, category, price, quantity, min_stock, max_stock, supplier_id, barcode)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [sku, name, description, category, price, quantity, min_stock || 10, max_stock || 1000, supplier_id, barcode]
+            `INSERT INTO products (sku, name, description, category, price, cost_price, quantity, min_stock, max_stock, supplier_id, barcode)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [sku, name, description, category, price, cost_price || 0, quantity, min_stock || 10, max_stock || 1000, supplier_id, barcode]
         );
 
         res.status(201).json({ 
@@ -96,12 +97,13 @@ router.post('/', authMiddleware, adminOnly, [
 
 // Update product (Admin only)
 router.put('/:id', authMiddleware, adminOnly, async (req, res) => {
-    const { name, price, min_stock, max_stock, category, description } = req.body;
+    const { name, price, cost_price, min_stock, max_stock, category, description } = req.body;
     const updates = [];
     const params = [];
 
     if (name) { updates.push('name = ?'); params.push(name); }
     if (price !== undefined) { updates.push('price = ?'); params.push(price); }
+    if (cost_price !== undefined) { updates.push('cost_price = ?'); params.push(cost_price); }
     if (min_stock !== undefined) { updates.push('min_stock = ?'); params.push(min_stock); }
     if (max_stock !== undefined) { updates.push('max_stock = ?'); params.push(max_stock); }
     if (category) { updates.push('category = ?'); params.push(category); }

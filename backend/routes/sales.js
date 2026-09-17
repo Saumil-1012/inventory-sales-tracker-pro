@@ -22,7 +22,7 @@ router.post('/', authMiddleware, staffOrAdmin, [
     try {
         // Check if product exists and has sufficient stock
         const product = await dbModule.get(
-            'SELECT quantity FROM products WHERE id = ?',
+            'SELECT quantity, cost_price FROM products WHERE id = ?',
             [product_id]
         );
 
@@ -36,9 +36,9 @@ router.post('/', authMiddleware, staffOrAdmin, [
 
         // Record sale
         const result = await dbModule.run(
-            `INSERT INTO sales (product_id, quantity, price_per_unit, total_amount, user_id, status)
-             VALUES (?, ?, ?, ?, ?, 'COMPLETED')`,
-            [product_id, quantity, price_per_unit, total_amount, req.user.id]
+            `INSERT INTO sales (product_id, quantity, price_per_unit, cost_price, total_amount, user_id, status)
+             VALUES (?, ?, ?, ?, ?, ?, 'COMPLETED')`,
+            [product_id, quantity, price_per_unit, product.cost_price || 0, total_amount, req.user.id]
         );
 
         // Deduct from inventory

@@ -1,0 +1,17 @@
+.locations h1 { margin-bottom: 6px; }
+.locations-header { display:flex; justify-content:space-between; gap:20px; align-items:center; margin-bottom:24px; }
+.locations-header p { color:#667085; }
+.locations-message { padding:10px 14px; background:#e6f4ea; color:#176b2c; border-radius:4px; }
+.locations-panel { background:white; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.1); margin-bottom:20px; }
+.locations-panel h2 { font-size:18px; margin-bottom:16px; }
+.transfer-form { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)) auto; gap:10px; }
+.transfer-form input, .transfer-form select { padding:10px; border:1px solid #d0d5dd; border-radius:4px; font:inherit; }
+.location-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+.location-card { display:grid; gap:6px; padding:16px; border:1px solid #e4e7ec; border-top:3px solid #007bff; border-radius:4px; }
+.location-card span { color:#667085; font-size:13px; }
+.location-card b { font-size:22px; color:#007bff; }
+.locations-table { overflow-x:auto; }
+.locations-table table { width:100%; border-collapse:collapse; }
+.locations-table th, .locations-table td { padding:12px; text-align:left; border-bottom:1px solid #eaecf0; }
+@media (max-width:900px) { .transfer-form { grid-template-columns:1fr 1fr; } }
+@media (max-width:600px) { .locations-header { display:block; } .locations-message { display:inline-block; margin-top:12px; } .transfer-form { grid-template-columns:1fr; } }
