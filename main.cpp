@@ -6,8 +6,11 @@
 #include "ui/ui.h"
 
 int main() {
-    Inventory inventory("data/inventory.txt");
-    Sales sales("data/sales.txt");
+    const std::string inventoryPath = Utils::getInventoryPath();
+    const std::string salesPath = Utils::getSalesPath();
+
+    Inventory inventory(inventoryPath);
+    Sales sales(salesPath);
 
     Role role = Auth::login();
     if (role == Role::INVALID) return 1;
