@@ -55,7 +55,7 @@ const ensureCostPriceColumns = () => {
 
 const seedDefaultUsers = async () => {
     const defaultUsers = [
-        ['admin1', 'admin12345', 'admin1@example.com', 'ADMIN'],
+        ['admin1', 'Saumil123', 'admin1@example.com', 'ADMIN'],
         ['staff1', 'staff123', 'staff1@example.com', 'STAFF']
     ];
 
